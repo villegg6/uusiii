@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <title>Peruuta markkinointiviestit – Jätteeks Jääny</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: sans-serif; background: #F4F1ED; color: #1E1E1E; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+    .box { background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 2px 6px rgba(0,0,0,0.15); max-width: 400px; width: 100%; text-align: center; }
+    input { width: 100%; padding: 0.8rem; margin: 1rem 0; border: 1px solid #ccc; border-radius: 0.5rem; }
+    button { background: #2E4D34; color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 0.5rem; cursor: pointer; }
+    button:hover { background: #1e3523; }
+    .msg { margin-top: 1rem; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>Peruuta markkinointiviestit</h2>
+    <p>Syötä sähköpostiosoitteesi ja peruuta markkinointisuostumus.</p>
+    <input type="email" id="emailInput" placeholder="Sähköpostiosoite" required>
+    <button id="unsubscribeBtn">Peruuta</button>
+    <div id="message" class="msg"></div>
+  </div>
+
+  <script>
+    async function unsubscribe() {
+      const email = document.getElementById("emailInput").value.trim();
+      if (!email) {
+        document.getElementById("message").innerText = "Anna sähköpostiosoite.";
+        return;
+      }
+
+      try {
+        const res = await fetch("https://us-central1-studio-9112593643.cloudfunctions.net/unsubscribeUser", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email })
+        });
+
+        if (res.ok) {
+          document.getElementById("message").innerText = "Markkinointisuostumus peruttu onnistuneesti.";
+        } else {
+          const text = await res.text();
+          document.getElementById("message").innerText = "Virhe: " + text;
+        }
+      } catch (err) {
+        document.getElementById("message").innerText = "Virhe yhteydessä palvelimeen.";
+      }
+    }
+
+    document.getElementById("unsubscribeBtn").addEventListener("click", unsubscribe);
+  </script>
+</body>
+</html>
